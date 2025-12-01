@@ -1,5 +1,5 @@
 public class Puck {
-  PVector pos = new PVector(0, 0);
+  PVector pos = new PVector(0, 0), vel = new PVector(0,0);
   float r = 27.5;
   float hitbox = r/2;
   
@@ -9,12 +9,17 @@ public class Puck {
   }
   
   public void update() {
-  if (isPlayerHittingPuck) {
-    pos.x = player.pos.x + cos(player.rotation) * player.hitbox;
-    pos.y = player.pos.y + sin(player.rotation) * player.hitbox;
-  }
-}
+    if (isPlayerHittingPuck) {
+      pos.x = player.pos.x + cos(player.rotation) * player.hitbox;
+      pos.y = player.pos.y + sin(player.rotation) * player.hitbox;
+    } else {
+      pos.add(vel);
 
+      vel.mult(0.95);
+
+      if (vel.mag() < 0.01) vel.set(0, 0);
+    }
+}
   
   public void render() {
     noStroke();

@@ -1,10 +1,8 @@
 public class Player {
-  PVector pos = new PVector(0,0);
+  PVector pos = new PVector(0,0), vel = new PVector(0, 0);
   float r = 50;
   float hitbox = r/2;
   float rotation = 0;
-
-  PVector vel = new PVector(0, 0);
   float accelStrength = 0.6;
   float friction = 0.94;
 
@@ -12,6 +10,14 @@ public class Player {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
   }
+    
+  public void shoot() {
+    float shotStrength = map(shotProgress, 0, 810, 5, 50);
+    puck.vel.x = shotStrength * cos(rotation);
+    puck.vel.y = shotStrength * sin(rotation);
+    isPlayerHittingPuck = false;
+  }
+
 
   public void update() {
     PVector accel = new PVector(0, 0);
@@ -34,6 +40,7 @@ public class Player {
     
      PVector dir = PVector.sub(mousePos, pos);
      rotation = atan2(dir.y, dir.x);
+     
   }
 
   public void render() {
