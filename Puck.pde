@@ -9,17 +9,15 @@ public class Puck {
   }
   
   public void update() {
-    if (isPlayerHittingPuck) {
-      pos.x = player.pos.x + cos(player.rotation) * player.hitbox;
-      pos.y = player.pos.y + sin(player.rotation) * player.hitbox;
+    if (holder != null && holder.hasPuck) {
+      pos.x = holder.pos.x + cos(holder.rotation) * holder.hitbox;
+      pos.y = holder.pos.y + sin(holder.rotation) * holder.hitbox;
     } else {
       pos.add(vel);
-
-      vel.mult(0.95);
-
+      vel.mult(0.99);
       if (vel.mag() < 0.01) vel.set(0, 0);
     }
-}
+  }
   
   public void render() {
     noStroke();
