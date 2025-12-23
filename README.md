@@ -5,6 +5,7 @@
 ## Features:
 * AI player movement
 * Custom animations and sounds
+* Realistic Physics
 * More!
 
 ## To Run:
