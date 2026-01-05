@@ -3,7 +3,7 @@ public class Player {
   float r = 50;
   float hitbox = r/2;
   float rotation = 0;
-  float accelStrength = 0.75;
+  float accelStrength = 1.2;
   float friction = 0.93;
   boolean hasPuck = false, shooting = false, controlled = false;   
   String position = new String("");
@@ -58,7 +58,7 @@ public class Player {
      
   }
   
-public void aiMovement() {
+  public void aiMovement() {
     float aiAccelStrength = accelStrength * 0.9;
 
     HashMap<String, PVector> rel = Positions.dists.get(this.position);
@@ -90,7 +90,6 @@ public void aiMovement() {
         vel.add(desiredDir);
     }
 
-    vel.mult(friction);
     pos.add(vel);
 }
 
@@ -100,6 +99,7 @@ public void aiMovement() {
     translate(pos.x, pos.y);
     rotate(rotation);
     if (this.controlled) {
+      strokeCap(ROUND);
       stroke(0, 0, 0);
       strokeWeight(5);
     } else {

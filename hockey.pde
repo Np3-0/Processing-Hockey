@@ -4,9 +4,11 @@ import processing.sound.*;
 
 Player[] players = new Player[5];
 Player holder;
+PImage rink;
 Puck puck;
 Goal goal;
 Game game;
+Timer timer;
 public PVector mousePos;
 //controls
 public boolean left = false, right = false, up = false, down = false;
@@ -16,13 +18,14 @@ int lastHolderInd = 0;
 
 void setup() {
   size(1080,720);
-  translate(width/2, height/2);
   noStroke();
+  rink = loadImage("rink.png");
   game = new Game();
   Positions.putValuesInHash();
   for (int i = 0; i < players.length; i++) {
-    players[i] = new Player(new PVector(width/(i+2), height/(i+2)), i == 0, Positions.positions[i]);
+    players[i] = new Player(new PVector(0, 0), i == 0, Positions.positions[i]);
   }
+  players[1].pos.set(width/2, height/2);
   text("LOADING", width/2, height/2);
   puck = new Puck(new PVector(width/3, height/3));
   mousePos = new PVector(mouseX, mouseY);
@@ -31,30 +34,47 @@ void setup() {
   game.goalSound.play();
   game.goalSound.pause();
   game.goalText = new TextAnim("GOOOOAAAAALLLL!", 4.6);
+  timer = new Timer();
+  timer.time = millis(); //<>//
 }
 
 void draw(){
-  background(220);
+  background(247);
+  resetMatrix();
+  
   rectMode(CENTER);
   noStroke();
   mousePos = new PVector(mouseX, mouseY);
+  moveCamera();
+  
+  imageMode(CENTER);
+  image(rink, width/2, height/2);
+  //camera
+  
+  strokeWeight(5);
+  stroke(0);
+  line(0, height/2, width, height/2);
+  
   for (Player player: players) {
     player.update();
-  }
-  puck.update();
-  collisionCheck();
-  
-  for (Player player : players) {
     player.render();
   }
+
+  puck.update();
   puck.render();
   goal.render();
+  collisionCheck();
+   
+  resetMatrix();
+  timer.update();
   game.renderHUD();
+  
   if (game.goalScored) {
     boolean done = game.goalText.run();
     if (done) {
       game.goalText.reset();
       game.goalScored = false;
+      timer.isPaused = false;
       puck.pos.set(width/2, height/2);
     }
   }
@@ -75,6 +95,10 @@ void draw(){
   if (holder != null && !holder.shooting) shotProgress = 0;
 }
 
+void moveCamera() {
+  if (holder != null) translate(width/2 - holder.pos.x, height/2 - holder.pos.y);
+}
+
 void collisionCheck() {
   for (int i = 0; i < players.length; i++) {
     float distance = dist(players[i].pos.x, players[i].pos.y, puck.pos.x, puck.pos.y);
@@ -85,22 +109,22 @@ void collisionCheck() {
     game.goal();
   }
 
-  if (puck.pos.x - puck.hitbox < 0) {
+  if (puck.pos.x - puck.hitbox < -500) {
     puck.pos.x = puck.hitbox;
     puck.vel.x *= -1;
   }
 
-  if (puck.pos.x + puck.hitbox > width) {
+  if (puck.pos.x + puck.hitbox > width + 250) {
     puck.pos.x = width - puck.hitbox;
     puck.vel.x *= -1;
   }
 
-  if (puck.pos.y - puck.hitbox < 0) {
+  if (puck.pos.y - puck.hitbox < -250) {
     puck.pos.y = puck.hitbox;
     puck.vel.y *= -1;
   }
 
-  if (puck.pos.y + puck.hitbox > height) {
+  if (puck.pos.y + puck.hitbox > height + 500) {
     puck.pos.y = height - puck.hitbox;
     puck.vel.y *= -1;
   }
