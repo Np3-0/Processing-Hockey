@@ -9,11 +9,10 @@ public class Goal {
     this.pos.y = pos.y;
     img = loadImage("goal.png");
   }
-  public void update() {
-    
-  }
-  
+
+  // renders to screen
   public void render() {
+    imageMode(CORNER);
     noStroke();
     fill(0, 255, 0);
     image(img, pos.x-w*2, pos.y-h, 192, 192);
