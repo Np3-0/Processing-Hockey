@@ -1,17 +1,10 @@
-/*
-Name: Nathan O'Brien
-Date: 1/21/26
-Program: Portfolio Project - Hockey
-*/
 import java.util.HashMap;
 import java.util.Map;
 import processing.sound.*;
 
 Player[] players = new Player[5];
-Player[] enemies = new Player[5];
 Player holder;
 PImage rink;
-PFont font;
 Puck puck;
 Goal goal;
 Game game;
@@ -24,24 +17,27 @@ float shotProgress = 0;
 int lastHolderInd = 0;
 
 void setup() {
-  size(1080,720, P2D);
-  frameRate(60);
+  size(1080,720);
   noStroke();
+  rink = loadImage("rink.png");
   game = new Game();
-  
-  font = loadFont("GillSansMT-BoldItalic-48.vlw");
-  textFont(font);
-  
+  Positions.putValuesInHash();
+  for (int i = 0; i < players.length; i++) {
+    players[i] = new Player(new PVector(0, 0), i == 0, Positions.positions[i]);
+  }
+  players[1].pos.set(width/2, height/2);
   text("LOADING", width/2, height/2);
-  game.setupObjects();
-  // soundfile needs to be outside for it to work
+  puck = new Puck(new PVector(width/3, height/3));
+  mousePos = new PVector(mouseX, mouseY);
+  goal = new Goal(new PVector(width-50, height/2));
   game.goalSound = new SoundFile(this, "goal.mp3");
   game.goalSound.play();
   game.goalSound.pause();
-   //<>//
+  game.goalText = new TextAnim("GOOOOAAAAALLLL!", 4.6);
+  timer = new Timer();
+  timer.time = millis(); //<>//
 }
 
-// runs neccesary code for each input.
 void draw(){
   background(247);
   resetMatrix();
@@ -52,17 +48,51 @@ void draw(){
   moveCamera();
   
   imageMode(CENTER);
-  image(rink, width/2, height/2);  
+  image(rink, width/2, height/2);
+  //camera
+  
   strokeWeight(5);
   stroke(0);
+  line(0, height/2, width, height/2);
   
-  game.reloadObjects();
+  for (Player player: players) {
+    player.update();
+    player.render();
+  }
+
+  puck.update();
+  puck.render();
+  goal.render();
+  collisionCheck();
    
   resetMatrix();
   timer.update();
   game.renderHUD();
-  game.checkConditions();
   
+  if (game.goalScored) {
+    boolean done = game.goalText.run();
+    if (done) {
+      game.goalText.reset();
+      game.goalScored = false;
+      timer.isPaused = false;
+      puck.pos.set(width/2, height/2);
+    }
+  }
+
+  holder = getPlayerWithPuck();
+  if (holder != null && holder.shooting && holder.hasPuck) {
+    stroke(0);
+    strokeWeight(1);
+    fill(255);
+    rect(width/2, height-50, width*0.75, 100);
+    fill(0,255,0);
+    rectMode(CORNER);
+    
+    rect(135, height-100, shotProgress, 100);
+    shotProgress = constrain(shotProgress+15, 1, 810);
+  }
+  
+  if (holder != null && !holder.shooting) shotProgress = 0;
 }
 
 void moveCamera() {
@@ -70,34 +100,53 @@ void moveCamera() {
 }
 
 void collisionCheck() {
-  //gets which player has the puck
   for (int i = 0; i < players.length; i++) {
     float distance = dist(players[i].pos.x, players[i].pos.y, puck.pos.x, puck.pos.y);
     players[i].hasPuck = distance <= 30;
   }
   
-  //checks to see if a player shot the puck in the goal
   if ((puck.pos.x + puck.hitbox > goal.pos.x - goal.w/2 && puck.pos.x - puck.hitbox < goal.pos.x + goal.w/2) && (puck.pos.y - puck.hitbox > goal.pos.y - goal.h/2 && puck.pos.y + puck.hitbox < goal.pos.y + goal.h/2) && puck.vel.x > 0) {
     game.goal();
   }
 
-  //gets 
   if (puck.pos.x - puck.hitbox < -500) {
+    puck.pos.x = puck.hitbox;
     puck.vel.x *= -1;
   }
 
-  if (puck.pos.x + puck.hitbox > width + 500) {
+  if (puck.pos.x + puck.hitbox > width + 250) {
+    puck.pos.x = width - puck.hitbox;
     puck.vel.x *= -1;
   }
 
-  if (puck.pos.y - puck.hitbox < -95) {
+  if (puck.pos.y - puck.hitbox < -250) {
+    puck.pos.y = puck.hitbox;
     puck.vel.y *= -1;
   }
 
-  if (puck.pos.y + puck.hitbox > height + 95) {
+  if (puck.pos.y + puck.hitbox > height + 500) {
+    puck.pos.y = height - puck.hitbox;
     puck.vel.y *= -1;
   }
 }
+
+public Player getPlayerWithPuck() {
+  for (Player p : players) {
+    p.controlled = false;
+  }
+
+  for (int i = 0; i < players.length; i++) {
+    if (players[i].hasPuck) {
+      lastHolderInd = i;
+      players[i].controlled = true;
+      return players[i];
+    }
+  }
+
+  players[lastHolderInd].controlled = true;
+  return players[lastHolderInd];
+}
+
 
 void keyPressed(){
   if (key == 'w') {
@@ -126,7 +175,7 @@ void keyReleased(){
     right = false;
   } if (key == ' ') {
     if (holder != null && holder.hasPuck) {
-        holder.shoot(shotProgress);
+        holder.shoot();
     }
     if (holder != null) holder.shooting = false;
     shotProgress = 0;

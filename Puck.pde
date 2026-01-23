@@ -8,7 +8,6 @@ public class Puck {
     this.pos.y = pos.y;
   }
   
-  // rotates the puck and player to the appropriate angle
   public void update() {
     if (holder != null && holder.hasPuck) {
       pos.x = holder.pos.x + cos(holder.rotation) * holder.hitbox;
@@ -20,7 +19,6 @@ public class Puck {
     }
   }
   
-  //renders puck
   public void render() {
     noStroke();
     fill(0);
