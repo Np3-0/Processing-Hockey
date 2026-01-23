@@ -1,7 +1,9 @@
 public static class Positions {
   static String[] positions = {"LW", "C", "RW", "RD", "LD", "G"};
+  static String[] mapAreas = {"OFF", "CEN", "DEF"};
   static HashMap<String, HashMap<String, PVector>> dists = new HashMap<>();
-
+  
+  //gets all values inside of the dists hashmap  
   public static void putValuesInHash() {
     HashMap<String, PVector> LW = new HashMap<>();
     LW.put("C",  new PVector(0, 240));

@@ -2,7 +2,9 @@ public class Timer {
   int wait = 1000, mins = 3, secs = 0;
   int time = 0;
   boolean isPaused = false;
+  TextAnim endPeriod;
   
+  //updates timer
   public void update() {
     if (!isPaused && millis() - time >= wait) {
       secs -= 1;
@@ -17,8 +19,8 @@ public class Timer {
     }
   }
   
+  // displays time with correct formatting  
   public String display() {
-    
-    return str(mins) + ":" + (secs == 0 ? str(secs) + "0" : str(secs));
+    return str(mins) + ":" + (secs == 0 ? str(secs) + "0" : (secs < 10 ? "0" + str(secs) : str(secs)));
   }
 }
