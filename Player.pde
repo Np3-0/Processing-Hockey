@@ -40,8 +40,14 @@ public class Player {
     puck.vel.y = shotStrength * sin(rotation);
     hasPuck = false;
   }
-
-  //update/render methods
+  /**
+     * Updates the player's state each frame.
+     * For controlled players, applies acceleration based on input keys
+     * and updates velocity and position with friction.
+     * For uncontrolled players, runs AI movement.
+     * Also calculates rotation to face the mouse position (or target)
+     *Global Variables: movement (up/down/etc), controlled
+   */
   public void update() {
     if (c == color(0,0,255)) {
      // enemyMovement();

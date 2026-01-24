@@ -13,7 +13,7 @@ Player holder;
 PImage rink;
 PFont font;
 Puck puck;
-Goal goal;
+Goal goal, goal2;
 Game game;
 Timer timer;
 public PVector mousePos;
@@ -65,10 +65,22 @@ void draw(){
   
 }
 
+/**
+ * Translates the scene so that the camera is centered on the holder object.
+ * If a holder exists, the view is shifted such that the holder's position
+ * appears at the center of the screen. If the holder is {@code null},
+ * no translation is applied.
+*/
 void moveCamera() {
   if (holder != null) translate(width/2 - holder.pos.x, height/2 - holder.pos.y);
 }
 
+/**
+ * Handles all puck-related collisions and interactions.
+ * This method determines puck possession for each player, checks
+ * if the puck has entered either goal to award a score, and
+ * reflects the puck off the rink boundaries when it goes out of bounds.
+ */
 void collisionCheck() {
   //gets which player has the puck
   for (int i = 0; i < players.length; i++) {
@@ -77,11 +89,25 @@ void collisionCheck() {
   }
   
   //checks to see if a player shot the puck in the goal
-  if ((puck.pos.x + puck.hitbox > goal.pos.x - goal.w/2 && puck.pos.x - puck.hitbox < goal.pos.x + goal.w/2) && (puck.pos.y - puck.hitbox > goal.pos.y - goal.h/2 && puck.pos.y + puck.hitbox < goal.pos.y + goal.h/2) && puck.vel.x > 0) {
-    game.goal();
+  if (
+    puck.pos.x + puck.hitbox > goal.pos.x - goal.w/2 &&
+    puck.pos.x - puck.hitbox < goal.pos.x + goal.w/2 &&
+    puck.pos.y + puck.hitbox > goal.pos.y - goal.h/2 &&
+    puck.pos.y - puck.hitbox < goal.pos.y + goal.h/2 &&
+    puck.vel.x > 0
+  ) {
+    game.goal(0);
+  } if (
+    puck.pos.x + puck.hitbox > goal2.pos.x - goal2.w/2 &&
+    puck.pos.x - puck.hitbox < goal2.pos.x + goal2.w/2 &&
+    puck.pos.y + puck.hitbox > goal2.pos.y - goal2.h/2 &&
+    puck.pos.y - puck.hitbox < goal2.pos.y + goal2.h/2 &&
+    puck.vel.x < 0
+  ) {
+    game.goal(1);
   }
 
-  //gets 
+  //gets collisions for puck
   if (puck.pos.x - puck.hitbox < -500) {
     puck.vel.x *= -1;
   }

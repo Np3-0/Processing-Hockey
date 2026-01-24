@@ -3,11 +3,13 @@ public class Goal {
   float w = 50, h = 100;
   float postWidth = 5;
   PImage img;
+  int team;
   
-  public Goal(PVector pos) {
+  public Goal(PVector pos, int team) {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
-    img = loadImage("goal.png");
+    this.team = team;
+    img = loadImage(team == 0 ? "goal.png" : "goal_reverse.png");
   }
 
   // renders to screen

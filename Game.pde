@@ -6,6 +6,13 @@ public class Game {
   boolean goalScored;
   int curPeriod = 0;
   
+  /**
+   * Initializes and sets up all core game objects.
+   * This includes loading assets, creating players and the puck,
+   * positioning goals, initializing UI text animations, and
+   * starting the game timer.
+   * Uses goal, rink, players array, puck, and more.
+  */
   public void setupObjects() {
     rink = loadImage("rink.png");
     Positions.putValuesInHash();
@@ -16,14 +23,22 @@ public class Game {
     players[1].pos.set(width/2, height/2);
     puck = new Puck(new PVector(width/3, height/3));
     mousePos = new PVector(mouseX, mouseY);
-    goal = new Goal(new PVector(width+435, height/2));
+    goal = new Goal(new PVector(width+435, height/2), 0);
+    goal2 = new Goal(new PVector(-428, height/2), 1);
     game.goalText = new TextAnim("GOOOOAAAAALLLL!", 4.6);
     timer = new Timer();
     timer.time = millis();
     timer.endPeriod = new TextAnim("END PERIOD", 4.6);
   }
   
-  public void goal() {
+  /**
+    * Handles scoring logic when a goal is made.
+    * This method pauses the game timer, plays the goal sound,
+    * displays the goal animation, and increments the score
+    * for the specified team. A goal can only be counted once
+    * until the game state is reset.
+  */
+  public void goal(int team) {
     // goal logic
     if (!goalScored) {
       timer.isPaused = true;
@@ -31,7 +46,7 @@ public class Game {
       goalSound.play();
       textSize(128);
       goalText.run();
-      score[0]++;
+      score[team]++;
     }
   }
   
@@ -40,8 +55,14 @@ public class Game {
     text("GAME OVER! Press Esc to Quit", width/2, height/2);
   }
   
-  //gets player who has the puck
-  public Player getPlayerWithPuck() {
+  /**
+   * Returns the player currently in possession of the puck.
+   * All players are first marked as uncontrolled, then the player
+   * with the puck (if any) is set as controlled and returned.
+   * If no player currently has the puck, the last player who held it
+   * regains control.
+   */
+   public Player getPlayerWithPuck() {
     for (Player p : players) {
       p.controlled = false;
     }
@@ -58,7 +79,11 @@ public class Game {
     return players[lastHolderInd];
   }
   
-  //gets objects to reload each draw loop
+  /**
+   * Updates and renders all active game objects for the current frame.
+   * This includes players, the puck, and goals, and also performs
+   * collision checks after object updates.
+  */
    public void reloadObjects() {
       for (Player player: players) {
       player.update();
@@ -73,10 +98,11 @@ public class Game {
     puck.update();
     puck.render();
     goal.render();
+    goal2.render();
     collisionCheck();
   }
   
-  //checks game conditions
+  
   public void checkConditions () {
     if (game.goalScored) {
       boolean done = game.goalText.run();
